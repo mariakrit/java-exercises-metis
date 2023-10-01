@@ -1,0 +1,21 @@
+openweathermapForAthens:
+  scheme: https
+  apiUrl: api.openweathermap.org/data/2.5/weather
+  paramLatitude: 37.97945
+  paramLongitude: 23.71622
+  apiKey: c1b2ba93d1230f5027825f1ef774ff5e
+  unitCelsius: metric
+  
+spring:
+  mail:
+    host: 127.0.0.1
+    username: maria
+    password: testPass
+    port: 3025
+    protocol: smtp
+    properties:
+      mail:
+        smptp:
+          auth: true
+          starttls:
+            enable: true
