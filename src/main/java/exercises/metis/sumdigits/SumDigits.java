@@ -1,7 +1,5 @@
 package exercises.metis.sumdigits;
 
-import org.springframework.stereotype.Component;
-
 public class SumDigits {
 
 	public static int calculateSumDigits(int n) {

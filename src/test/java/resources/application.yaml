@@ -1,7 +1,0 @@
-spring:
-  mail:
-    host: 127.0.0.1
-    username: maria
-    password: testPass
-    port: 3025
-    protocol: smtp

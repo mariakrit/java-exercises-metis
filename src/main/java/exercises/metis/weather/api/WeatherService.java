@@ -1,13 +1,9 @@
 package exercises.metis.weather.api;
 
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -21,14 +17,22 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Service
 public class WeatherService {
 
-	@Autowired
+	Logger log = LoggerFactory.getLogger(WeatherService.class);
+
 	private OpenWeatherMapProperties openWeatherMapProperties;
 
-	@Autowired
 	private RestTemplate restTemplate;
 
-	@Autowired
 	private JavaMailSender javaMailSender;
+
+	@Autowired
+	public WeatherService(OpenWeatherMapProperties openWeatherMapProperties, RestTemplate restTemplate,
+			JavaMailSender javaMailSender) {
+		super();
+		this.openWeatherMapProperties = openWeatherMapProperties;
+		this.restTemplate = restTemplate;
+		this.javaMailSender = javaMailSender;
+	}
 
 	@Scheduled(fixedRate = 60000) // Run every 1 minute (60,000 milliseconds)
 	public void fetchWeatherData() {
@@ -52,35 +56,35 @@ public class WeatherService {
 				// Parse the JSON response
 				ObjectMapper objectMapper = new ObjectMapper();
 				JsonNode jsonNode = objectMapper.readTree(jsonResponse);
-				double temp = jsonNode.get("main").get("temp").asDouble();
+				int temp = jsonNode.get("main").get("temp").asInt();
 
 				if (temp > 20.0) {
 					sendEmail(temp, jsonNode.get("main").get("humidity").asInt(),
 							jsonNode.get("wind").get("speed").asDouble(),
 							jsonNode.get("weather").get(0).get("description").asText());
 				}
+			} else {
+				throw new Exception("Request to api.openweathermap.org has been failed");
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("WeatherService failed to execute ", e);
 		}
 	}
 
 	// Send email notification
-	void sendEmail(double temperature, int humidity, double windSpeed, String weatherDescription) {
+	void sendEmail(int temperature, int humidity, double windSpeed, String weatherDescription) {
 		try {
 			SimpleMailMessage message = new SimpleMailMessage();
 
-			// Set email details
 			message.setFrom("admin@test.com");
-//			message.setTo("mariaskrit@yahoo.gr");
+			message.setTo("mariaskrit@gmail.com");
 			message.setSubject("Temperature is greater than 20°C in Athens: " + temperature + "°C");
 			message.setText("Temperature: " + temperature + "°C\n" + "Humidity: " + humidity + "\n" + "Wind speed: "
 					+ windSpeed + "\n" + "Weather description: " + weatherDescription);
 
-			// Send the email
 			javaMailSender.send(message);
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("Send email failed ", e);
 		}
 	}
 

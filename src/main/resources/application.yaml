@@ -8,10 +8,10 @@ openweathermapForAthens:
   
 spring:
   mail:
-    host: 127.0.0.1
-    username: maria
-    password: testPass
-    port: 3025
+    host: smtp.gmail.com
+    username: mariaskrit@gmail.com
+    password: 1234567
+    port: 587
     protocol: smtp
     properties:
       mail:
